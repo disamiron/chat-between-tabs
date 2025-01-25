@@ -1,0 +1,11 @@
+<mat-card class="message" [class.owner]="isOwner">
+  <mat-card-header>
+    <mat-card-subtitle
+      ><b>{{ message.tabId }}</b> {{ message.date | date : "dd.MM.yyyy hh:mm" }}
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p class="message__text">{{ message.message }}</p>
+  </mat-card-content>
+</mat-card>

@@ -1,13 +1,38 @@
 <div class="chat">
-  <div class="chat__messages"></div>
-  <div class="chat__input">
-    <form [formGroup]="chatFormGroup" class="form">
-      <mat-form-field appearance="outline" class="form__field">
-        <textarea matInput formControlName="message"></textarea>
+  <div class="chat__messages" #messagesContainer>
+    <app-message
+      *ngFor="let message of chatHistory$ | async"
+      [message]="message"
+      [isOwner]="message.tabId === tabId"
+    ></app-message>
+  </div>
+
+  <ng-container *ngIf="filtredTypingTabIds$ | async as typingTabIds">
+    <div class="chat__info" *ngIf="typingTabIds.length">
+      {{ typingTabIds | typingTabIds }}
+    </div>
+  </ng-container>
+
+  <div class="chat__manage">
+    <form [formGroup]="chatFormGroup" class="chat__manage_form">
+      <mat-form-field appearance="outline" class="form-field">
+        <input
+          matInput
+          formControlName="message"
+          class="form-field__textarea"
+          placeholder="Начните писать другим вкладкам"
+        />
       </mat-form-field>
+
+      <button
+        mat-fab
+        color="primary"
+        class="manual-key"
+        (click)="sendMessage()"
+        [disabled]="chatFormGroup.invalid"
+      >
+        <mat-icon> send </mat-icon>
+      </button>
     </form>
-    <button mat-fab color="primary" class="manual-key">
-      <mat-icon> send </mat-icon>
-    </button>
   </div>
 </div>

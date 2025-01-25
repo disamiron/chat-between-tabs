@@ -1,0 +1,46 @@
+.app {
+  display: flex;
+  height: 100%;
+  flex-direction: row-reverse;
+
+  &__menu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 300px;
+    padding: 30px 10px 0;
+    box-shadow: 2px 2px 5px var(--grey);
+    z-index: 1;
+  }
+}
+
+.tab {
+  flex-direction: row;
+  gap: 5px;
+  padding: 5px 10px;
+
+  &__avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--grey);
+  }
+
+  &__name {
+    color: var(--black);
+  }
+}
+
+@media (max-width: 900px) {
+  .app {
+    flex-direction: column;
+
+    &__menu {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: auto;
+      padding: 5px 20px;
+    }
+  }
+}

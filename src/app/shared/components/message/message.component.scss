@@ -1,0 +1,15 @@
+.message {
+  width: fit-content;
+  min-width: 200px;
+  max-width: 400px;
+
+  &__text {
+    margin: 0;
+    word-break: break-all;
+  }
+}
+
+.owner {
+  float: right;
+  background-color: var(--blue);
+}
