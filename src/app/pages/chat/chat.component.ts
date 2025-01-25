@@ -8,6 +8,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { BroadcastChannelService } from '@shared/services/broadcast-channel.service';
 import { ChatService } from '@shared/services/chat.service';
 import { MessageInterface } from '@shared/interfaces/message.interface';
 import {
@@ -51,7 +52,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscription: Subscription = new Subscription();
 
-  constructor(private chatService: ChatService) {}
+  constructor(
+    private broadcastChannelService: BroadcastChannelService,
+    private chatService: ChatService
+  ) {}
 
   public ngOnInit(): void {
     this.subscription.add(this.onTypingProcessChange());
@@ -70,9 +74,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.chatService.sendMessageBroadcastEvent(
-      this.chatFormGroup.value.message
-    );
+    this.broadcastChannelService.sendMessage(this.chatFormGroup.value.message);
     this.clearMessage();
   }
 
@@ -84,10 +86,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.chatFormGroup.controls.message.valueChanges
       .pipe(
         filter((value: string | null) => !!value),
-        tap(() => this.chatService.startTypingBroadcastEvent()),
+        tap(() => this.broadcastChannelService.startTyping()),
         debounceTime(CHAT_DEBOUNCE_TIME)
       )
-      .subscribe(() => this.chatService.stopTypingBroadcastEvent());
+      .subscribe(() => this.broadcastChannelService.stopTyping());
   }
 
   private chatHistoryProcessChange(): Subscription {

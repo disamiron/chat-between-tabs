@@ -5,8 +5,9 @@ import { AppComponent } from './app.component';
 import { ChatComponent } from './pages/chat/chat.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ChatService } from './shared/services/chat.service';
-import { SharedModule } from './shared/shared.module';
+import { ChatService } from '@shared/services/chat.service';
+import { SharedModule } from '@shared/shared.module';
+import { BroadcastChannelService } from '@shared/services/broadcast-channel.service';
 
 @NgModule({
   declarations: [AppComponent, ChatComponent],
@@ -17,7 +18,7 @@ import { SharedModule } from './shared/shared.module';
     BrowserAnimationsModule,
     SharedModule,
   ],
-  providers: [ChatService],
+  providers: [BroadcastChannelService, ChatService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

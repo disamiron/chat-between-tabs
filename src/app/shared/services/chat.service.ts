@@ -4,15 +4,6 @@ import { MessageInterface } from '../interfaces/message.interface';
 import { StorageService } from './storage.service';
 import { StorageType } from '../types/storage.type';
 
-const broadcastChannelName: string = 'CHAT_BETWEEN_TABS';
-
-enum BroadcastChannelType {
-  typing = 'TYPING',
-  stopTyping = 'STOP_TYPING',
-  message = 'MESSAGE',
-  clearHistory = 'CLEAR_HISTORY',
-}
-
 @Injectable()
 export class ChatService {
   public tabId: string = `Tab-${Math.random()
@@ -32,116 +23,32 @@ export class ChatService {
     shareReplay(1)
   );
 
-  private broadcastChannel: BroadcastChannel = new BroadcastChannel(
-    broadcastChannelName
-  );
-
   constructor(private storageService: StorageService) {
-    this.setupBroadcastChannel();
     this.initChatHistory();
   }
 
-  public startTypingBroadcastEvent(): void {
-    this.broadcastChannel.postMessage({
-      type: BroadcastChannelType.typing,
-      tabId: this.tabId,
-    });
-  }
-
-  public stopTypingBroadcastEvent(): void {
-    this.broadcastChannel.postMessage({
-      type: BroadcastChannelType.stopTyping,
-      tabId: this.tabId,
-    });
-  }
-
-  public sendMessageBroadcastEvent(message: string): void {
-    const newMessage: MessageInterface = {
-      tabId: this.tabId,
-      message: message,
-      date: new Date(),
-    };
-
-    this.broadcastChannel.postMessage({
-      type: BroadcastChannelType.message,
-      message: newMessage,
-    });
-
-    this.addMessage(newMessage);
-  }
-
-  public clearHistoryBroadcastEvent(): void {
-    this.broadcastChannel.postMessage({
-      type: BroadcastChannelType.clearHistory,
-    });
-
-    this.clearHistory();
-  }
-
-  private clearHistory(): void {
-    const clearedHistory: MessageInterface[] = [];
-
-    this.chatHistorySource$.next(clearedHistory);
-    this.saveChatHistory(clearedHistory);
-  }
-
-  private initChatHistory(): void {
-    const chatHistory: MessageInterface[] | null = this.storageService.getItem(
-      StorageType.history
-    );
-
-    if (chatHistory) {
-      this.chatHistorySource$.next(chatHistory);
-    }
-  }
-
-  private setupBroadcastChannel(): void {
-    this.broadcastChannel.onmessage = (event: MessageEvent) => {
-      const data = event.data;
-
-      switch (data.type) {
-        case BroadcastChannelType.typing: {
-          this.addTypingTabId(data.tabId);
-          break;
-        }
-
-        case BroadcastChannelType.stopTyping: {
-          this.removeTabIdById(data.tabId);
-          break;
-        }
-
-        case BroadcastChannelType.message: {
-          this.addMessage(data.message);
-          break;
-        }
-
-        case BroadcastChannelType.clearHistory: {
-          this.clearHistory();
-          break;
-        }
-      }
-    };
-  }
-
-  private addMessage(message: MessageInterface): void {
+  public addMessage(message: MessageInterface): void {
     this.chatHistory$
       .pipe(take(1))
       .subscribe((chatHistory: MessageInterface[]) => {
-        let updatedChatHistory: MessageInterface[] = [...chatHistory, message];
-
-        if (updatedChatHistory.length > 100) {
-          updatedChatHistory.shift();
-        }
+        const updatedChatHistory: MessageInterface[] = [
+          ...chatHistory,
+          message,
+        ];
 
         this.chatHistorySource$.next([...updatedChatHistory]);
+        this.removeTabIdById(message.tabId);
 
         this.saveChatHistory(updatedChatHistory);
-
-        this.removeTabIdById(message.tabId);
       });
   }
 
-  private addTypingTabId(externalTapId: string): void {
+  public clearHistory(): void {
+    this.chatHistorySource$.next([]);
+    this.saveChatHistory([]);
+  }
+
+  public addTypingTabId(externalTapId: string): void {
     this.typingTabIds$.pipe(take(1)).subscribe((typingTabIds: string[]) => {
       if (!typingTabIds.includes(externalTapId)) {
         let updatedTabIds: string[] = [...typingTabIds, externalTapId];
@@ -151,7 +58,7 @@ export class ChatService {
     });
   }
 
-  private removeTabIdById(id: string): void {
+  public removeTabIdById(id: string): void {
     this.typingTabIds$
       .pipe(
         take(1),
@@ -162,6 +69,16 @@ export class ChatService {
       .subscribe((updatedTypingTabIds: string[]) =>
         this.typingTabIdsSource$.next(updatedTypingTabIds)
       );
+  }
+
+  private initChatHistory(): void {
+    const chatHistory: MessageInterface[] | null = this.storageService.getItem(
+      StorageType.history
+    );
+
+    if (chatHistory) {
+      this.chatHistorySource$.next(chatHistory);
+    }
   }
 
   private saveChatHistory(chatHistory: MessageInterface[]): void {
