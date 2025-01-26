@@ -22,6 +22,7 @@ import {
   tap,
 } from 'rxjs';
 
+const CHAT_DELAY_TIME: number = 100;
 const CHAT_DEBOUNCE_TIME: number = 5000;
 
 @Component({
@@ -94,7 +95,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private chatHistoryProcessChange(): Subscription {
     return combineLatest([this.chatHistory$, this.filtredTypingTabIds$])
-      .pipe(delay(100))
+      .pipe(delay(CHAT_DELAY_TIME))
       .subscribe(() => this.scrollToBottom());
   }
 

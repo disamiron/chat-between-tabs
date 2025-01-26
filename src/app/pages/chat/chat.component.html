@@ -8,13 +8,17 @@
   </div>
 
   <ng-container *ngIf="filtredTypingTabIds$ | async as typingTabIds">
-    <div class="chat__info" *ngIf="typingTabIds.length">
+    <div class="chat__info" *ngIf="typingTabIds.length > 0">
       {{ typingTabIds | typingTabIds }}
     </div>
   </ng-container>
 
   <div class="chat__manage">
-    <form [formGroup]="chatFormGroup" class="chat__manage_form">
+    <form
+      [formGroup]="chatFormGroup"
+      class="chat__manage_form"
+      (ngSubmit)="sendMessage()"
+    >
       <mat-form-field appearance="outline" class="form-field">
         <input
           matInput
@@ -28,7 +32,7 @@
         mat-fab
         color="primary"
         class="manual-key"
-        (click)="sendMessage()"
+        type="submit"
         [disabled]="chatFormGroup.invalid"
       >
         <mat-icon> send </mat-icon>

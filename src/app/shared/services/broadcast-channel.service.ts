@@ -62,6 +62,10 @@ export class BroadcastChannelService {
     this.broadcastChannel.onmessage = (event: MessageEvent) => {
       const data = event.data;
 
+      if (!data || !data.type) {
+        return;
+      }
+
       switch (data.type) {
         case BroadcastChannelType.typing: {
           this.chatService.addTypingTabId(data.tabId);

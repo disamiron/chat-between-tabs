@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, shareReplay, take } from 'rxjs';
+import {
+  BehaviorSubject,
+  distinctUntilChanged,
+  map,
+  Observable,
+  shareReplay,
+  take,
+} from 'rxjs';
 import { MessageInterface } from '../interfaces/message.interface';
 import { StorageService } from './storage.service';
 import { StorageType } from '../types/storage.type';
@@ -14,13 +21,14 @@ export class ChatService {
   private chatHistorySource$: BehaviorSubject<MessageInterface[]> =
     new BehaviorSubject<MessageInterface[]>([]);
   public chatHistory$: Observable<MessageInterface[]> =
-    this.chatHistorySource$.pipe(shareReplay(1));
+    this.chatHistorySource$.pipe(shareReplay(1), distinctUntilChanged());
 
   private typingTabIdsSource$: BehaviorSubject<string[]> = new BehaviorSubject<
     string[]
   >([]);
   public typingTabIds$: Observable<string[]> = this.typingTabIdsSource$.pipe(
-    shareReplay(1)
+    shareReplay(1),
+    distinctUntilChanged()
   );
 
   constructor(private storageService: StorageService) {
@@ -72,9 +80,9 @@ export class ChatService {
   }
 
   private initChatHistory(): void {
-    const chatHistory: MessageInterface[] | null = this.storageService.getItem(
-      StorageType.history
-    );
+    const chatHistory: MessageInterface[] | null = this.storageService.getItem<
+      MessageInterface[] | null
+    >(StorageType.history);
 
     if (chatHistory) {
       this.chatHistorySource$.next(chatHistory);

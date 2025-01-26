@@ -10,14 +10,7 @@ import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [MessageComponent, TypingTabIdsPipe],
-  imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatCardModule,
-    MatFormFieldModule,
-    CommonModule,
-  ],
+  imports: [MatCardModule, CommonModule],
   exports: [
     MessageComponent,
     TypingTabIdsPipe,
