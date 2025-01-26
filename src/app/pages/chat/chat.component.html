@@ -1,10 +1,20 @@
 <div class="chat">
-  <div class="chat__messages" #messagesContainer>
-    <app-message
-      *ngFor="let message of chatHistory$ | async"
-      [message]="message"
-      [isOwner]="message.tabId === tabId"
-    ></app-message>
+  <div
+    class="chat__messages"
+    #messagesContainer
+    *ngIf="chatHistory$ | async as chatHistory"
+  >
+    <div *ngIf="chatHistory.length === 0; else messages" class="empty">
+      <p>Кажется, тут пока нету сообщений, начните писать первым</p>
+    </div>
+
+    <ng-template #messages>
+      <app-message
+        *ngFor="let message of chatHistory"
+        [message]="message"
+        [isOwner]="message.tabId === tabId"
+      ></app-message
+    ></ng-template>
   </div>
 
   <ng-container *ngIf="filtredTypingTabIds$ | async as typingTabIds">

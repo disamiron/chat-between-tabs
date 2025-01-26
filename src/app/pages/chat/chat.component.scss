@@ -49,3 +49,12 @@
     resize: none;
   }
 }
+
+.empty {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  color: var(--grey);
+}
